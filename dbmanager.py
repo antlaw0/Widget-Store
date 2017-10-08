@@ -52,16 +52,18 @@ while(running==True):
 	elif cmd == "password":
 		n=input("Enter username to get password for: ")
 		p= dbhelper.getPassword(n)
-		
-		if dbhelper.getPassword(n)== '12345':
-			print('success')
-		else:
-			print("no")
-			#print(dbhelper.getPassword(n))
+		print(p)
 	elif cmd=="insert":
-		dbhelper.insertUser("Anthony","12345")
-		print("User inserted")
-	else:
-		print("Exiting...")
+		n=input("Enter username to insert: ")
+		p=input("Enter password to insert for this user: ")
+		dbhelper.insertUser(n, p)
+		print("User: "+n+" with password: "+p+" inserted.")
+	elif cmd == "delete":
+		n=input("Enter user to delete: ")
+		dbhelper.deleteUser(n)
+	elif cmd == "exit":
+		print("exiting...")
 		running=False
-		break;
+	else:
+		print("command not recognized")
+		
