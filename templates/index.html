@@ -1,24 +1,14 @@
-<DOCTYPEHTML>
-<head>
-<title>Widgetorium</title>
-</head>
-<body>
-Welcome to Widgetorium. We have many widgets for you to buy.
+<html>
+<h1><center>Hello there</h1></center>
 <br>
-<h1>Login to continue</h1>
-{% if message %}
-{{message}}
-{% endif %}
-<form method="POST" action="">
-username: <input type="text" name="username"></input>
-<br>
-Password: <input type="password" name="password"></input>
-<br>
-<input type="submit" name="submit" value="Submit">
-</form
-</form>
-<br>
-<h1> Or </h1>
-<a href="/signup">sign up</a>
+
+{% for user in users %}
+{{user}}
+{% endfor %}
+
+{% extends 'base.html' %}
+
+{% block content %}
+{% endblock %}
 
 </html>
