@@ -24,14 +24,15 @@ class User(db.Model):
 
 @app.route('/')
 def home():
-	#user = User('Jane Appleton', 'Jane.appleton@example.com')
+	#user = User('John Smith', 'john.smith@example.com')
 	#db.session.add(user)
 	#db.session.commit()
 	all_users = User.query.all()
 	#name= all_users[0].name
 	users=[]
-	for i in all_users:
-		users.append(all_users[i].name)
+	users.append(all_users[0].name)
+	#users.append(all_users[1].name)
+	#users.append(all_users[2].name)
 	return render_template('index.html', users=users)
 
 
