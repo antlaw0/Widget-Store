@@ -1,0 +1,35 @@
+<DOCTYPEHTML>
+<title>Widgetorium- Registration</title>
+<h1><center>Registration</h1></center>
+<body>
+<br>
+<br>
+Fill out the form to register an account.
+<br>
+<br>
+{% for message in messages %}
+{{message}}
+<br>
+{% endfor %}
+<br>
+<form method='POST' action="">
+Enter e-mail:
+<br>
+<input type="email" id="email" name="email"></input>
+<br>
+Enter user name:
+<br>
+<input type="text" id="username" name="username"></input>
+<br>
+Enter password:
+<br>
+<input type="password" id="password" name="password"></input>
+<br>
+Re-enter password:
+<br>
+<input type="password" id="password2" name="password2"></input>
+<br>
+<input type="submit" id="submit" name="submit"></input>
+</form>
+</body>
+</html>

@@ -1,11 +1,25 @@
 <html>
-<h1><center>Hello there</h1></center>
+<title>Widgetorium</title>
+<h1><center>Widgetorium</h1></center>
 <br>
+<center>Welcome to Widgetorium, your one stop shop for all your widget needs.</center>
 
-{% for user in users %}
-{{user}}
+<br>
+{% for message in messages %}
+{{message}}
 {% endfor %}
-
+<br>
+<form method="POST" action="">
+Enter e-mail: <input type="email" id="email" name="email"></input>
+<br>
+Enter username:  <input type="text" id="username" name="username"></input>
+<br>
+Enter password: <input type="password" id="password" name="password"></input>
+<br>
+<input type="submit" name="submit" value="Submit">
+</form
+</form>
+<a href="/registration">Register</a>
 {% extends 'base.html' %}
 
 {% block content %}
