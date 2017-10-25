@@ -104,12 +104,17 @@ def index():
 
 @app.route('/test', methods=['POST', 'GET'])
 def test():
+	#i=1
+	#w = Widget.query.filter_by(id=i).first()
+	#w.size='gigantic'
+	#db.session.commit()
 	
 	#db.drop_all()
 	#db.create_all()
 	#u= User('Anthony', 'antlaw0@gmail.com', '12345678')
 	#db.session.add(u)
 	#db.session.commit()
+	
 	
 	results=[]
 	rs=User.query.all()
@@ -121,14 +126,34 @@ def test():
 	for i in widgets:
 		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color)
 	if request.method=='POST':
+		id=request.form['id']
 		name=request.form['name']
 		description=request.form['description']
 		size=request.form['size']
 		color=request.form['color']
-		w= Widget(name, description, size, color)
-		db.session.add(w)
-		db.session.commit()
-		print("Widget: "+name+" added.")
+		delete=request.form['delete']
+		#no id specified, create new widget
+		if id == "":
+			w= Widget(name, description, size, color)
+			db.session.add(w)
+			db.session.commit()
+			print("Widget: "+name+" added.")
+		else:	
+			w = Widget.query.filter_by(id=id).first()
+			#if delete checkbox checked, delete widget with given id
+			if delete:
+				db.session.delete(w)
+				db.session.commit()
+			if name != "":
+				w.name=name
+			if description != "":
+				w.description=description
+			if size != "":
+				w.size=size
+			if color != "":
+				w.color=color
+			db.session.commit()
+	
 		#return render_template('test.html', results=results)
 
 	
