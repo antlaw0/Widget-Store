@@ -23,6 +23,24 @@ class User(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+class Widget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    description= db.Column(db.String(120))
+    size= db.Column(db.String(12))
+    color= db.Column(db.String(12))
+	
+    
+    def __init__(self, name, description, size,color):
+        self.name = name
+        self.description=description
+        self.size=size
+        self.color=color
+        
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+		
 def getId(email):
 	u = User.query.filter_by(email=e).first()
 	return u.id
@@ -86,21 +104,34 @@ def index():
 
 @app.route('/test', methods=['POST', 'GET'])
 def test():
+	
+	#db.drop_all()
+	#db.create_all()
 	#u= User('Anthony', 'antlaw0@gmail.com', '12345678')
 	#db.session.add(u)
 	#db.session.commit()
 	
 	results=[]
 	rs=User.query.all()
+	results.append("Users \n")
 	for r in rs:
 		results.append(str(r.id)+" "+r.name+" "+r.email+" "+r.password)
-	if userExists('antlaw0@gmail.com'):
-		results.append('yes')
-	else:
-		results.append('no')
-	#u = User.query.filter_by(name='Anthony').first()
-	#print(u.email)
-	#results.append(u.name+" "+u.email)
+	results.append(" \n Widgets")
+	widgets=Widget.query.all()
+	for i in widgets:
+		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color)
+	if request.method=='POST':
+		name=request.form['name']
+		description=request.form['description']
+		size=request.form['size']
+		color=request.form['color']
+		w= Widget(name, description, size, color)
+		db.session.add(w)
+		db.session.commit()
+		print("Widget: "+name+" added.")
+		#return render_template('test.html', results=results)
+
+	
 	return render_template('test.html', results=results)
 
 @app.route('/registration', methods=['GET', 'POST'])
