@@ -1,8 +1,53 @@
 <DOCTYPEHTML>
+<link rel="stylesheet"
+      type="text/css"
+      href="../static/css/store.css"/>
+
+
 <title>Widgetorium- Store</title>
 <body>
 <center><h1>Widgetorium</h1></center>
 <center>Welcome {{username}}</center>
+<br>
+<table>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Description</th>
+<th>Size</th>
+<th>Color</th>
+<th>Price</th>
+<th>Quantity</th>
+</tr>
+{% for widget in widgets %}
+<tr>
+<td>
+{{widget[0]}}
+</td>
+<td>
+ {{widget[1]}}
+ </td>
+ <td>
+ {{widget[2]}}
+ </td>
+ <td>
+ {{widget[3]}}
+ </td>
+ <td>
+ {{widget[4]}}
+ </td>
+ <td>
+ {{widget[5]}}
+ </td>
+<td>
+<form method='POST' action="/store">
+<input type="hidden" name="wid" value={{widget[0]}}></input>
+<input type="hidden" name="quantity" value='0'></input>
+<input type="submit" name="submit"></input>
+</form>
+</td>
+{% endfor %}
+</table>
 
 </body>
 </html>

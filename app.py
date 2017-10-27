@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from flask import render_template, session, request, redirect, url_for
+from flask import render_template, session, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -14,11 +14,14 @@ class User(db.Model):
     name = db.Column(db.String(80))
     password = db.Column(db.String(20))
     email = db.Column(db.String(120), unique=True)
+    type = db.Column(db.String(120))
 
-    def __init__(self, name, email, password):
+
+    def __init__(self, name, email, password,type):
         self.name = name
         self.password=password
         self.email = email
+        self.type=type
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -29,19 +32,22 @@ class Widget(db.Model):
     description= db.Column(db.String(120))
     size= db.Column(db.String(12))
     color= db.Column(db.String(12))
+    price = db.Column(db.Integer)
+    
 	
     
-    def __init__(self, name, description, size,color):
+    def __init__(self, name, description, size,color, price):
         self.name = name
         self.description=description
         self.size=size
         self.color=color
+        self.price=price
         
     def __repr__(self):
         return '<Name %r>' % self.name
 
 		
-def getId(email):
+def getId(e):
 	u = User.query.filter_by(email=e).first()
 	return u.id
 
@@ -49,6 +55,25 @@ def getUsername(email):
 	u = User.query.filter_by(email=email).first()
 	return u.name
 
+def getAccountType(email):
+	u = User.query.filter_by(email=email).first()
+	return u.type
+
+def getWidgets():
+	mainList=[]
+	rs=Widget.query.all()
+	for r in rs:
+		l=[]
+		l.append(r.id)
+		l.append(r.name)
+		l.append(r.description)
+		l.append(r.size)
+		l.append(r.color)
+		l.append(r.price)
+		mainList.append(l)
+		#widgets.append(r.name+" "+r.description+" "+r.size+" "+r.color+" "+r.price)
+	return mainList
+		
 	
 def getPassword(email):
 	u = User.query.filter_by(email=email).first()
@@ -73,7 +98,7 @@ print("User: "+name+" created.")
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if 'email' in session:
-        return render_template('store.html')
+        return render_template('store.html', widgets=getWidgets())
     else:
         messages=[]
         if request.method=='POST':
@@ -84,9 +109,12 @@ def index():
             if userExists(email) == True:
                 #if password matches password in database
                 if getPassword(email) == password:
+                    session['id']=getId(email)
                     session['username']=getUsername(email)
                     session['email'] = email
-                    return render_template('store.html', username=getUsername(email))
+                    session['accounttype']=getAccountType(email)
+                    username=session['username']
+                    return render_template('store.html', username=username, widgets=getWidgets())
 
                 else:
                     messages.append("Invalid password")
@@ -104,6 +132,11 @@ def index():
 
 @app.route('/test', methods=['POST', 'GET'])
 def test():
+	if 'accounttype' in session:
+		if session['accounttype'] != 'admin':
+			return render_template('index.html',messages=None)
+	
+	
 	#i=1
 	#w = Widget.query.filter_by(id=i).first()
 	#w.size='gigantic'
@@ -120,30 +153,56 @@ def test():
 	rs=User.query.all()
 	results.append("Users \n")
 	for r in rs:
-		results.append(str(r.id)+" "+r.name+" "+r.email+" "+r.password)
+		results.append(str(r.id)+" "+r.name+" "+r.email+" "+r.password+" "+r.type)
 	results.append(" \n Widgets")
 	widgets=Widget.query.all()
 	for i in widgets:
-		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color)
+		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color+" "+str(i.price))
 	if request.method=='POST':
 		id=request.form['id']
 		name=request.form['name']
 		description=request.form['description']
 		size=request.form['size']
 		color=request.form['color']
+		price=request.form['price']
 		delete=request.form['delete']
+		userid=request.form['userid']
+		username=request.form['username']
+		email=request.form['email']
+		password=request.form['password']
+		accounttype=request.form['accounttype']
+		userdelete=request.form['userdelete']
+		print("form to create new widget submitted.")
+		#if userid submitted
+		if userid != "":
+			u = User.query.filter_by(id=userid).first()
+			if username != "":
+				u.name=username
+			if email != "":
+				u.email=email
+			if password != "":
+				u.password=password
+			if accounttype != "":
+				u.type=accounttype
+			db.session.commit()
+	
+		
 		#no id specified, create new widget
 		if id == "":
-			w= Widget(name, description, size, color)
-			db.session.add(w)
-			db.session.commit()
-			print("Widget: "+name+" added.")
+			if name != "" and description !="" and size !="" and color != "" and price != "":
+				w= Widget(name, description, size, color, price)
+				db.session.add(w)
+				db.session.commit()
+				print("Widget: "+name+" added.")
+			else:
+				flash("enter all fields")
 		else:	
 			w = Widget.query.filter_by(id=id).first()
 			#if delete checkbox checked, delete widget with given id
-			if delete:
+			if delete =="delete":
 				db.session.delete(w)
 				db.session.commit()
+				return render_template('test.html', results=results)
 			if name != "":
 				w.name=name
 			if description != "":
@@ -152,9 +211,11 @@ def test():
 				w.size=size
 			if color != "":
 				w.color=color
+			if price != "":
+				w.price=price
 			db.session.commit()
 	
-		#return render_template('test.html', results=results)
+		return render_template('test.html', results=results)
 
 	
 	return render_template('test.html', results=results)
@@ -195,7 +256,7 @@ def registration():
             return render_template('registration.html', messages=messages)
         else:
             #insert new user
-            u= User(username, email, password)
+            u= User(username, email, password,'customer')
             db.session.add(u)
             db.session.commit()
 	
@@ -205,7 +266,42 @@ def registration():
     else:
         return render_template('registration.html', messages=messages)
     
-
+@app.route('/store', methods=['POST', 'GET'])
+def store():
+	if 'email' in session:
+		if request.method == 'POST':
+			wid=request.form['wid']
+			return render_template('viewWidget.html', wid=wid)
+		widgets=getWidgets()
+		return render_template('store.html', widgets=widgets)
+	else:
+		messages=[]
+		messages.append("log in to continue")
+		return render_template('index.html', messages=messages)
+	
+@app.route('/viewWidget', methods=['POST', 'GET'])
+def viewWidget():
+	if 'email' in session:
+		i=request.form['wid']
+		if request.method == 'POST':
+			i=request.form['wid']
+			quantity=request.form['quantity']
+			print("ID is "+i+" and quantity is "+quantity)
+		w = Widget.query.filter_by(id=i).first()
+		wid=w.id
+		widgetName=w.name
+		widgetDescription=w.description
+		widgetSize=w.size
+		widgetColor=w.color
+		widgetPrice=w.price
+		
+		return render_template('viewWidget.html', wid=wid, widgetName=widgetName, widgetDescription=widgetDescription, widgetSize=widgetSize, widgetColor=widgetColor, widgetPrice=widgetPrice)
+	
+	else:
+		messages=[]
+		messages.append("log in to continue")
+		return render_template('index.html', messages=messages)
+	
 			
 #if __name__ == '__main__':
 #port = int(os.environ.get('PORT', 5000))

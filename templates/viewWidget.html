@@ -1,0 +1,23 @@
+<DOCTYPEHTML>
+<title>Widget View- {{widgetName}}</title>
+<body>
+<center><h1>{{widgetName}}</h1></center>
+<br>
+<br>
+Size: {{widgetSize}}
+<br>
+Color: {{widgetColor}}
+<br>
+Description: {{widgetDescription}}
+<br>
+Price: {{widgetPrice}}
+<br>
+Quantity:
+<form method='POST' action="/viewWidget">
+<input type="number" name="quantity" id="quantity"></input>
+<input type="hidden" name="wid" value={{wid}}></input>
+<input type="submit" name="submit" id="submit"></input>
+</form>
+
+</body>
+</html>
