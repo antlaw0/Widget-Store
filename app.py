@@ -46,6 +46,24 @@ class Widget(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Integer)
+    itemid = db.Column(db.Integer)
+    quantity = db.Column(db.Integer)
+    status = db.Column(db.String(120))
+
+
+    def __init__(self, userid, itemid, quantity, status):
+        self.userid=userid
+        self.itemid=itemid
+        self.quantity=quantity
+        self.status=status
+		
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+		
 		
 def getId(e):
 	u = User.query.filter_by(email=e).first()
@@ -88,7 +106,7 @@ def userExists(e):
 	else:
 		return True
 
-		"""		
+"""		
 u= User(name, email, password)
 db.session.add(u)
 db.session.commit()
@@ -158,6 +176,10 @@ def test():
 	widgets=Widget.query.all()
 	for i in widgets:
 		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color+" "+str(i.price))
+	orders=Order.query.all()
+	results.append("\n Orders \n Order ID userID itemID Quantity order status")
+	for o in orders:
+		results.append(str(o.id)+" "+str(o.userid)+" "+str(o.itemid)+" "+str(o.quantity)+" "+o.status)
 	if request.method=='POST':
 		id=request.form['id']
 		name=request.form['name']
@@ -270,9 +292,17 @@ def registration():
 def store():
 	if 'email' in session:
 		if request.method == 'POST':
-			wid=request.form['wid']
-			return render_template('viewWidget.html', wid=wid)
-		widgets=getWidgets()
+			i=request.form['wid']
+			w = Widget.query.filter_by(id=i).first()
+			wid=w.id
+			widgetName=w.name
+			widgetDescription=w.description
+			widgetSize=w.size
+			widgetColor=w.color
+			widgetPrice=w.price
+			return render_template('viewWidget.html', wid=wid, widgetName=widgetName, widgetDescription=widgetDescription, widgetSize=widgetSize, widgetColor=widgetColor, widgetPrice=widgetPrice)
+	
+			ets=getWidgets()
 		return render_template('store.html', widgets=widgets)
 	else:
 		messages=[]
@@ -286,7 +316,13 @@ def viewWidget():
 		if request.method == 'POST':
 			i=request.form['wid']
 			quantity=request.form['quantity']
-			print("ID is "+i+" and quantity is "+quantity)
+			uid=session['id']
+			#print("UserID is "+str(uid)+" WidgetID is "+i+" and quantity is "+quantity)
+			#Add order to Order table
+			o= Order(uid, i, quantity, 'open')
+			db.session.add(o)
+			db.session.commit()
+
 		w = Widget.query.filter_by(id=i).first()
 		wid=w.id
 		widgetName=w.name
