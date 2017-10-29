@@ -87,7 +87,7 @@ def getWidgets():
 		l.append(r.description)
 		l.append(r.size)
 		l.append(r.color)
-		l.append(r.price)
+		l.append(format(r.price/100, '.2f'))
 		mainList.append(l)
 		#widgets.append(r.name+" "+r.description+" "+r.size+" "+r.color+" "+r.price)
 	return mainList
@@ -192,7 +192,7 @@ def test():
 	results.append(" \n Widgets")
 	widgets=Widget.query.all()
 	for i in widgets:
-		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color+" "+str(i.price))
+		results.append(str(i.id)+" "+i.name+" "+i.description+" "+i.size+" "+i.color+" "+"$"+str(format(i.price/100,'.2f')))
 	orders=Order.query.all()
 	results.append("\n Orders \n Order ID userID itemID Quantity order status")
 	for o in orders:
@@ -319,7 +319,7 @@ def store():
 			widgetDescription=w.description
 			widgetSize=w.size
 			widgetColor=w.color
-			widgetPrice=w.price
+			widgetPrice=format(w.price/100,'.2f')
 			return render_template('viewWidget.html', wid=wid, widgetName=widgetName, widgetDescription=widgetDescription, widgetSize=widgetSize, widgetColor=widgetColor, widgetPrice=widgetPrice)
 	
 		widgets=getWidgets()
