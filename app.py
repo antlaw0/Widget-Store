@@ -207,7 +207,7 @@ def test():
 			if accounttype != "":
 				u.type=accounttype
 			db.session.commit()
-	
+		
 		
 		#no id specified, create new widget
 		if id == "":
@@ -216,6 +216,8 @@ def test():
 				db.session.add(w)
 				db.session.commit()
 				print("Widget: "+name+" added.")
+				return render_template('test.html', results=results)
+
 			else:
 				flash("enter all fields")
 		else:	
@@ -236,7 +238,8 @@ def test():
 			if price != "":
 				w.price=price
 			db.session.commit()
-	
+			return render_template('test.html', results=results)
+
 		return render_template('test.html', results=results)
 
 	
