@@ -97,6 +97,23 @@ def getPassword(email):
 	u = User.query.filter_by(email=email).first()
 	return u.password
 
+def getOrdersById(i):
+	mainList=[]
+	rs=Order.query.all()
+	for r in rs:
+		if r.userid == i:
+			l=[]
+			l.append(r.id)
+			l.append(r.itemid)
+			#get name of widget in order
+			w = Widget.query.filter_by(id=r.itemid).first()
+			#put widget name in order list
+			l.append(w.name)
+			l.append(r.quantity)
+			l.append(r.status)
+			mainList.append(l)
+		
+	return mainList
 	
 		
 def userExists(e):
@@ -116,7 +133,7 @@ print("User: "+name+" created.")
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if 'email' in session:
-        return render_template('store.html', widgets=getWidgets())
+        return render_template('store.html', username=session['username'], widgets=getWidgets(), orders=getOrdersById(session['id']))
     else:
         messages=[]
         if request.method=='POST':
@@ -132,7 +149,7 @@ def index():
                     session['email'] = email
                     session['accounttype']=getAccountType(email)
                     username=session['username']
-                    return render_template('store.html', username=username, widgets=getWidgets())
+                    return render_template('store.html', username=username, widgets=getWidgets(), orders=getOrdersById(session['id']))
 
                 else:
                     messages.append("Invalid password")
@@ -287,7 +304,7 @@ def registration():
 	
             session['username'] = username
             session['email']=email
-            return render_template('store.html')
+            return render_template('store.html', username=username, widgets=getWidgets(), orders=getOrdersById(session['id']))
     else:
         return render_template('registration.html', messages=messages)
     
@@ -305,8 +322,9 @@ def store():
 			widgetPrice=w.price
 			return render_template('viewWidget.html', wid=wid, widgetName=widgetName, widgetDescription=widgetDescription, widgetSize=widgetSize, widgetColor=widgetColor, widgetPrice=widgetPrice)
 	
-			ets=getWidgets()
-		return render_template('store.html', widgets=widgets)
+		widgets=getWidgets()
+		orders=getOrdersById(session['id'])
+		return render_template('store.html', username=session['username'], widgets=widgets, orders=orders)
 	else:
 		messages=[]
 		messages.append("log in to continue")
@@ -325,6 +343,9 @@ def viewWidget():
 			o= Order(uid, i, quantity, 'open')
 			db.session.add(o)
 			db.session.commit()
+			#go back to store
+			return render_template('store.html', username=session['username'], widgets=getWidgets(), orders=getOrdersById(session['id']))
+	
 
 		w = Widget.query.filter_by(id=i).first()
 		wid=w.id

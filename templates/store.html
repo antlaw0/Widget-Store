@@ -9,6 +9,8 @@
 <center><h1>Widgetorium</h1></center>
 <center>Welcome {{username}}</center>
 <br>
+<h2>Available Widgets</h2>
+<br>
 <table>
 <tr>
 <th>ID</th>
@@ -17,7 +19,7 @@
 <th>Size</th>
 <th>Color</th>
 <th>Price</th>
-<th>Quantity</th>
+<th>View</th>
 </tr>
 {% for widget in widgets %}
 <tr>
@@ -43,11 +45,41 @@
 <form method='POST' action="/store">
 <input type="hidden" name="wid" value={{widget[0]}}></input>
 <input type="hidden" name="quantity" value='0'></input>
-<input type="submit" name="submit"></input>
+<input type="submit" name="submit" value="view"></input>
 </form>
 </td>
 {% endfor %}
 </table>
-
+<br>
+<h2>{{username}}'s Order History</h2>
+<br>
+<table>
+<tr>
+<th>Order ID</th>
+<th>Item ID</th>
+<th>Item Name</th>
+<th>Quantity</th>
+<th>Order Status</th>
+</tr>
+{% for order in orders %}
+<tr>
+<td>
+{{order[0]}}
+</td>
+<td>
+{{order[1]}}
+</td>
+<td>
+{{order[2]}}
+</td>
+<td>
+{{order[3]}}
+</td>
+<td>
+{{order[4]}}
+</td>
+</tr>
+{% endfor %}
+</table>
 </body>
 </html>
