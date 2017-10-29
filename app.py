@@ -304,6 +304,7 @@ def registration():
 	
             session['username'] = username
             session['email']=email
+            session['id']=getId(email)
             return render_template('store.html', username=username, widgets=getWidgets(), orders=getOrdersById(session['id']))
     else:
         return render_template('registration.html', messages=messages)
